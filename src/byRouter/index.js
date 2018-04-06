@@ -2,7 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Item from './Item';
 import Footer from './Footer';
-
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route
+} from 'react-router-dom';
 
 
 class App extends React.Component{
@@ -141,6 +145,9 @@ class App extends React.Component{
 
     let {todosData, inputVal, view} = this.state;
 
+    let {location:{pathname}} = this.props;
+
+
     let items = null,
     footer = null,
     itemsBox = null;
@@ -149,10 +156,10 @@ class App extends React.Component{
 
     items = todosData.filter(elt=>{
       if(elt.hasCompleted) leftCount--;
-      switch (view) {
-        case 'active':
+      switch (pathname) {
+        case '/active':
         return !elt.hasCompleted;
-        case 'completed':
+        case '/completed':
         return elt.hasCompleted
         default:
         return true;
@@ -194,8 +201,7 @@ class App extends React.Component{
             leftCount,
             showClearBtton: leftCount < todosData.length,
             onClearCompletedTodo,
-            changeView,
-            view
+            pathname
           }}
         />
       );
@@ -223,6 +229,10 @@ class App extends React.Component{
 }
 
 ReactDOM.render(
-  <App/>
+  <Router>
+    <Switch>
+      <Route path="/" component={App}/>
+    </Switch>
+  </Router>
 
   , document.getElementById('root'));

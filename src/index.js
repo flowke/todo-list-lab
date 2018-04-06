@@ -1,25 +1,10 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route
-} from 'react-router-dom';
 import registerServiceWorker from './registerServiceWorker';
-
-import BaseApp from './byBase';
 
 import './index.css';
 
+// import './byRouter';
+import './byBase';
 
-ReactDOM.render(
-  <Router>
-    <Switch>
-      <Route path="/" component={BaseApp}/>
-    </Switch>
-  </Router>
-
-  , document.getElementById('root'));
 
 
 registerServiceWorker();
