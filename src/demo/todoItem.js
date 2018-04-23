@@ -3,6 +3,61 @@ import React, {Component} from 'react';
 export default class Todo extends Component{
   constructor(props){
       super(props);
+
+      this.state = {
+        isInEdit: false,
+        editVal: ''
+      }
+  }
+
+  onEdit=()=>{
+    this.setState({
+      isInEdit: true,
+      editVal: this.props.content
+    },()=>{
+      this.editInputRef.focus();
+    })
+  }
+
+  editInput=(e)=>{
+    this.setState({
+      editVal: e.target.value
+    });
+  }
+
+
+
+  onSave=()=>{
+      let {changeTodoContent, id, deleteOneTodo} = this.props;
+
+    if(this.state.editVal.trim()===''){
+      deleteOneTodo(id);
+    }else{
+      changeTodoContent(id, this.state.editVal);
+
+      this.setState({
+        isInEdit: false,
+      });
+    }
+
+
+  }
+
+  onEditInputKeyDown=(e)=>{
+
+    console.log('onKeyDown');
+
+    if(e.keyCode===13){
+      this.onSave();
+    }
+
+    if(e.keyCode===27){
+      this.setState({
+        isInEdit: false,
+        editVal: this.props.content
+      });
+    }
+
   }
 
   render(){
@@ -15,7 +70,14 @@ export default class Todo extends Component{
       deleteOneTodo
     } = this.props;
 
+    let {
+      isInEdit,
+      editVal
+    } = this.state;
+
     let classnames = hasCompoleted ? 'completed': '';
+
+    classnames = isInEdit ? classnames + ' editing' : classnames;
 
     return (
        <li
@@ -31,7 +93,10 @@ export default class Todo extends Component{
              onChange={()=>toggleTodoStatus(id)}
            />
            {/* todo 的内容 */}
-           <label ref="label">
+           <label
+             ref="label"
+             onDoubleClick={this.onEdit}
+           >
              {content}
            </label>
            {/* 删除按钮 */}
@@ -45,7 +110,11 @@ export default class Todo extends Component{
          <input
            type="text"
            className="edit"
-           ref="editInput"
+           ref={elt=>this.editInputRef = elt}
+           value={editVal}
+           onChange={this.editInput}
+           onKeyDown={this.onEditInputKeyDown}
+           onBlur={this.onSave}
          />
        </li>
     )

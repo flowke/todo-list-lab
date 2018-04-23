@@ -13,7 +13,8 @@ class TodoList extends Component{
 
       this.state = {
         inputVal: '',
-        todos: []
+        todos: [],
+        view: 'all'
       }
 
   }
@@ -24,6 +25,7 @@ class TodoList extends Component{
     })
   }
 
+  // 提交(保存)一个 todo,
   handleInputKeyDown=(ev)=>{
     let {todos} = this.state;
     let {value,} = ev.target;
@@ -45,6 +47,7 @@ class TodoList extends Component{
     }
   }
 
+  // 改变 todo 的完成与未完成的状态
   toggleTodoStatus=(id)=>{
 
     let {todos} = this.state;
@@ -59,6 +62,7 @@ class TodoList extends Component{
     })
   }
 
+  // 删除一个 todo
   deleteOneTodo=(id)=>{
     let {todos} = this.state;
 
@@ -67,21 +71,97 @@ class TodoList extends Component{
     });
   }
 
+  // 全选
+  toggleAll=(event)=>{
+    let {todos} = this.state;
+
+    todos = todos.map(elt=>{
+          elt.hasCompoleted = event.target.checked;
+      return elt;
+    });
+
+    this.setState({
+      todos
+    });
+
+  }
+
+  // 改变当前视图
+  changeView=(view)=>{
+    this.setState({
+      view
+    })
+  }
+
+  // 清除已经完成的 todo
+  clearHasCompleted=()=>{
+    let {todos} = this.state;
+
+    todos = todos.filter(elt=>!elt.hasCompoleted);
+
+    this.setState({
+      todos
+    });
+
+  }
+
+  // 修改 todo 内容
+  changeTodoContent=(id, content)=>{
+    let {todos} = this.state;
+
+    todos = todos.map(elt=>{
+      if(elt.id===id){
+        elt.content = content;
+      };
+
+      return elt;
+    });
+
+    this.setState({
+      todos
+    })
+  }
+
   render(){
 
     let {
       todos,
-      inputVal
+      inputVal,
+      view
     } = this.state;
 
-    let todosComp = todos.map(todo=>{
+    let leftItem = todos.length;
+
+    let hasAllChecked = todos.every(todo=>todo.hasCompoleted);
+
+
+    let currentShowTodos = todos.filter(todo=>{
+      if(todo.hasCompoleted){
+        leftItem--;
+      };
+
+      switch (view) {
+        case 'active':
+            return !todo.hasCompoleted;
+          break;
+        case 'completed':
+            return todo.hasCompoleted;
+          break;
+        default:
+            return true;
+      }
+    });
+
+    let todosComp = currentShowTodos.map(todo=>{
+
       return (
         <Todo
           key={todo.id}
           {...todo}
           {...{
             toggleTodoStatus: this.toggleTodoStatus,
-            deleteOneTodo: this.deleteOneTodo
+            deleteOneTodo: this.deleteOneTodo,
+            changeTodoContent: this.changeTodoContent
           }}
         />
       )
@@ -108,7 +188,8 @@ class TodoList extends Component{
             <input
               type="checkbox"
               className="toggle-all"
-
+              onChange={this.toggleAll}
+              checked={hasAllChecked}
             />
             <ul className="todo-list">
               {todosComp}
@@ -117,9 +198,17 @@ class TodoList extends Component{
         )}
 
         {todos.length>0 && (
-          <Footer/>
-        )}
+          <Footer
+            {...{
+              leftItem,
+              isShowClearButton: todos.length > leftItem,
+              clearHasCompleted: this.clearHasCompleted,
+              view,
+              changeView: this.changeView
+            }}
 
+          />
+        )}
       </div>
     )
   }

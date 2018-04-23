@@ -1,7 +1,7 @@
 import registerServiceWorker from './registerServiceWorker';
 
 import './index.css';
-import './raw';
+import './demo';
 // import './byRouter';
 // import './byBase';
 
